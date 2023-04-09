@@ -217,6 +217,9 @@ export function ChatPanel(props: ChatPanelProps) {
               setInputValue(event.target.value);
             }}
             onPressEnter={(event) => {
+              if (event.altKey || event.ctrlKey || event.shiftKey || event.metaKey) {
+                return;
+              }
               event.preventDefault();
               if (!inputValue) {
                 return alert("请输入内容");
