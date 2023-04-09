@@ -1,5 +1,6 @@
 import { Alert, Avatar, Button, Card, Empty, Input, List } from "antd";
 import cn from "classnames";
+import { marked } from 'marked';
 import { SessionConfig } from "./config-modal";
 import { useEffect, useState } from "react";
 import { addMessage as addMessageToStore, getMessageList } from "./store/chat";
@@ -29,7 +30,7 @@ const messageConf = {
     classNames: {
       list: ["flex-row-reverse"],
       avatar: ["bg-teal-600", "ml-4"],
-      card: ["bg-teal-600"],
+      card: ["border-teal-600"],
     },
     avatar: "You",
     justify: "end",
@@ -38,7 +39,7 @@ const messageConf = {
     classNames: {
       list: ["flex-row"],
       avatar: ["bg-indigo-600", "mr-4"],
-      card: ["bg-indigo-600"],
+      card: ["border-indigo-600"],
     },
     avatar: "AI",
     justify: "start",
@@ -151,7 +152,7 @@ export function ChatPanel(props: ChatPanelProps) {
         addMessage({
           id: messageId,
           type: MessageType.Reply,
-          text: dataBuffer,
+          text: marked(dataBuffer),
         });
 
         scrollToEnd();
@@ -187,9 +188,9 @@ export function ChatPanel(props: ChatPanelProps) {
                 </Avatar>
                 <Card
                   size="small"
-                  className={cn("text-white", conf.classNames.card)}
+                  className={cn(conf.classNames.card)}
                 >
-                  {item.text}
+                  <div className="markdown-body"dangerouslySetInnerHTML={{ __html: item.text }}></div>
                 </Card>
               </List.Item>
             );

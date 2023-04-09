@@ -131,6 +131,12 @@ importers:
       classnames:
         specifier: ^2.3.2
         version: 2.3.2
+      github-markdown-css:
+        specifier: ^5.2.0
+        version: 5.2.0
+      marked:
+        specifier: ^4.3.0
+        version: 4.3.0
       next:
         specifier: ^13.1.1
         version: 13.1.1(@babel/core@7.0.0)(react-dom@18.2.0)(react@18.2.0)
@@ -147,6 +153,9 @@ importers:
       '@babel/core':
         specifier: ^7.0.0
         version: 7.0.0
+      '@types/marked':
+        specifier: ^4.0.8
+        version: 4.0.8
       '@types/node':
         specifier: ^17.0.12
         version: 17.0.12
@@ -1862,6 +1871,10 @@ packages:
 
   /@types/json5@0.0.29:
     resolution: {integrity: sha1-7ihweulOEdK4J7y+UnC86n8+ce4=}
+
+  /@types/marked@4.0.8:
+    resolution: {integrity: sha512-HVNzMT5QlWCOdeuBsgXP8EZzKUf0+AXzN+sLmjvaB3ZlLqO+e4u0uXrdw9ub69wBKFs+c6/pA4r9sy6cCDvImw==}
+    dev: true
 
   /@types/mime@3.0.1:
     resolution: {integrity: sha512-Y4XFY5VJAuw0FgAqPNd6NNoV44jbq9Bz2L7Rh/J6jLTiHBSBJa9fxqQIvkIld4GsoDOcCbvzOUAbLPsSKKg+uA==}
@@ -4129,6 +4142,10 @@ packages:
       get-intrinsic: 1.2.0
     dev: false
 
+  /github-markdown-css@5.2.0:
+    resolution: {integrity: sha512-hq5RaCInSUZ48bImOZpkppW2/MT44StRgsbsZ8YA4vJFwLKB/Vo3k7R2t+pUGqO+ThG0QDMi96TewV/B3vyItg==}
+    dev: false
+
   /glob-parent@5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
     engines: {node: '>= 6'}
@@ -5366,6 +5383,12 @@ packages:
     dependencies:
       tmpl: 1.0.5
     dev: true
+
+  /marked@4.3.0:
+    resolution: {integrity: sha512-PRsaiG84bK+AMvxziE/lCFss8juXjNaWzVbN5tXAm4XjeaS9NAHhop+PjQxz2A9h8Q4M/xGmzP8vqNwy6JeK0A==}
+    engines: {node: '>= 12'}
+    hasBin: true
+    dev: false
 
   /media-typer@0.3.0:
     resolution: {integrity: sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=}

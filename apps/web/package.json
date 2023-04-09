@@ -16,6 +16,8 @@
     "@mui/material": "^5.11.16",
     "antd": "^5.4.0",
     "classnames": "^2.3.2",
+    "github-markdown-css": "^5.2.0",
+    "marked": "^4.3.0",
     "next": "^13.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -23,6 +25,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
+    "@types/marked": "^4.0.8",
     "@types/node": "^17.0.12",
     "@types/react": "^18.0.22",
     "@types/react-dom": "^18.0.7",
