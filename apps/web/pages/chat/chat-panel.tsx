@@ -52,22 +52,14 @@ const messageConf = {
  */
 export function ChatPanel(props: ChatPanelProps) {
   const { sessionConfig } = props;
-
-  // 如果没有会话配置，则显示空
-  if (!sessionConfig) {
-    return (
-      <div className="flex justify-center items-center w-full">
-        <Empty />
-      </div>
-    );
-  }
-
-  const { systemPrompt, id } = sessionConfig;
   const [messageList, setMessageList] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
 
   // 获取消息列表
   useEffect(() => {
+    if (!sessionConfig?.id) {
+      return;
+    }
     getMessageList(id).then((messageList) => {
       if (messageList.length > 0) {
         setMessageList(messageList);
@@ -82,7 +74,21 @@ export function ChatPanel(props: ChatPanelProps) {
         });
       }
     });
-  }, [id]);
+  }, [sessionConfig?.id]);
+
+
+  // 如果没有会话配置，则显示空
+  if (!sessionConfig) {
+    return (
+      <div className="flex justify-center items-center w-full">
+        <Empty />
+      </div>
+    );
+  }
+
+  const { systemPrompt, id } = sessionConfig;
+
+  
 
   // 滚动到底部
   const scrollToEnd = () => {
