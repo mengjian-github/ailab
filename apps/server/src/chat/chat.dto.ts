@@ -64,4 +64,12 @@ export class ChatMessageDto {
 
   @IsArray()
   messageList: Array<any>;
+
+  @IsString()
+  @IsOptional()
+  filename?: string;
+
+  @IsString()
+  @IsOptional()
+  fileMimeType?: string;
 }

@@ -86,7 +86,7 @@ export function ChatPanel(props: ChatPanelProps) {
     );
   }
 
-  const { systemPrompt, id, extraDataUrl } = sessionConfig;
+  const { systemPrompt, id, extraDataUrl, filename } = sessionConfig;
 
   // 滚动到底部
   const scrollToEnd = () => {
@@ -202,6 +202,29 @@ export function ChatPanel(props: ChatPanelProps) {
       </div>
 
       <div className="absolute  bottom-8 left-16 right-16">
+      {filename && (
+          <Alert
+            className="mb-4"
+            message={
+              <div className="flex items-center justify-between">
+                <p className="min-width-0 flex-shrink-0 max-w-[80%] whitespace-nowrap overflow-hidden text-ellipsis">
+                  您当前基于文件（{filename}）内容：
+                  可对文件内容进行提问
+                </p>
+                <Button
+                  type="primary"
+                  size="small"
+                  onClick={() => sendMessage(true)}
+                >
+                  点此总结摘要
+                </Button>
+              </div>
+            }
+            type="info"
+            showIcon
+            closable
+          />
+        )}
         {extraDataUrl && (
           <Alert
             className="mb-4"

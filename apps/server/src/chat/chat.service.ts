@@ -4,7 +4,11 @@ import { CallbackManager } from 'langchain/callbacks';
 import { Observable, Subscriber } from 'rxjs';
 import { ChatMessageDto } from './chat.dto';
 import { ConversationalRetrievalQAChain } from 'langchain/chains';
-import { CheerioWebBaseLoader } from 'langchain/document_loaders';
+import {
+  CheerioWebBaseLoader,
+  PDFLoader,
+  TextLoader,
+} from 'langchain/document_loaders';
 import * as fs from 'fs';
 import { HNSWLib } from 'langchain/vectorstores';
 import { OpenAIEmbeddings } from 'langchain/embeddings';
@@ -46,7 +50,7 @@ export class ChatService {
         },
       });
 
-      if (data.extraDataUrl) {
+      if (data.extraDataUrl || data.filename) {
         this.qaWithContent(data, callbackManager);
       } else {
         this.chat(data, callbackManager);
@@ -82,12 +86,24 @@ export class ChatService {
     data: ChatMessageDto,
     callbackManager: CallbackManager,
   ) {
-    const loader = new CheerioWebBaseLoader(data.extraDataUrl);
+    let loader;
+    if (data.filename) {
+      loader = data.fileMimeType.includes('pdf')
+        ? new PDFLoader('./.uploads/' + data.filename, {
+            pdfjs: () => import('pdfjs-dist/legacy/build/pdf.js'),
+          })
+        : new TextLoader('./.uploads/' + data.filename);
+    } else {
+      loader = new CheerioWebBaseLoader(data.extraDataUrl);
+    }
     const docs = await loader.loadAndSplit();
 
     const path =
-      './.url-store/' +
-      crypto.createHash('md5').update(data.extraDataUrl).digest('hex');
+      './.store/' +
+      crypto
+        .createHash('md5')
+        .update(data.filename || data.extraDataUrl)
+        .digest('hex');
 
     let vectorStore;
     if (fs.existsSync(path)) {

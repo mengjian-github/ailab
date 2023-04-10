@@ -4,6 +4,7 @@ import { uuid } from "uuidv4";
 import { getOpenAIToken } from "../../global-store";
 import { InboxOutlined } from "@ant-design/icons";
 import { Upload } from "antd";
+import { UploadChangeParam, UploadFile } from "antd/es/upload";
 
 const { Dragger } = Upload;
 
@@ -58,6 +59,8 @@ export interface SessionConfig {
   maxTokens?: number;
   extraDataType: ExtraDataType;
   extraDataUrl?: string;
+  filename: string;
+  fileMimeType?: string;
 }
 
 // 附加数据类型
@@ -76,6 +79,7 @@ export function ConfigModal(props: ConfigModalProps) {
   const { mode, open, onOk, onCancel, initialSessionConfig } = props;
   const [form] = Form.useForm<SessionConfig>();
   const [extraDataType, setExtraDataType] = useState(ExtraDataType.None);
+  const [file, setFile] = useState<UploadFile<any> | null>(null);
 
   /**
    * 默认会话配置
@@ -93,6 +97,7 @@ export function ConfigModal(props: ConfigModalProps) {
     modelName: "gpt-3.5-turbo",
     extraDataType: ExtraDataType.None,
     extraDataUrl: "",
+    filename: ''
   };
 
   // 如果是修改模式, 则设置为当前会话配置(为了回显), 否则设置为默认会话配置
@@ -113,6 +118,13 @@ export function ConfigModal(props: ConfigModalProps) {
     }
   }, [initialSessionConfig, mode]);
 
+  const onFileChange = (info: UploadChangeParam<UploadFile<any>>) => {
+    const { status } = info.file;
+    if (status === 'done') {
+      setFile(info.file)
+    } 
+  };
+
   return (
     <Modal
       title={mode === ModalMode.Create ? "创建会话配置" : "修改会话配置"}
@@ -121,7 +133,11 @@ export function ConfigModal(props: ConfigModalProps) {
         form
           .validateFields()
           .then((values) => {
-            onOk(values);
+            onOk({
+              ...values,
+              filename: file?.response?.filename || '',
+              fileMimeType: file?.response?.mimetype || ''
+            });
           })
           .catch((info) => {
             console.log("Validate Failed:", info);
@@ -240,14 +256,14 @@ export function ConfigModal(props: ConfigModalProps) {
             label="额外资料文件"
             tooltip="提供给AI的额外资料，可以是网页或文件，AI将会根据这些资料进行回答。"
           >
-            <Dragger>
+            <Dragger action="/api/upload" accept=".pdf,.txt" onChange={onFileChange}>
               <p className="ant-upload-drag-icon">
                 <InboxOutlined />
               </p>
               <p className="ant-upload-text">
                 请点击或拖拽文件到此区域以上传。
               </p>
-              <p className="ant-upload-hint">支持单个或批量上传。</p>
+              <p className="ant-upload-hint">支持pdf和txt文件。</p>
             </Dragger>
           </Form.Item>
         )}
