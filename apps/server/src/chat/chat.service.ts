@@ -3,14 +3,27 @@ import { ChatOpenAI } from 'langchain/chat_models';
 import { CallbackManager } from 'langchain/callbacks';
 import { Observable, Subscriber } from 'rxjs';
 import { ChatMessageDto } from './chat.dto';
-import { ConversationChain } from 'langchain/chains';
+import {
+  ConversationChain,
+  ConversationalRetrievalQAChain,
+  loadQAMapReduceChain,
+  loadSummarizationChain,
+} from 'langchain/chains';
 import { BufferWindowMemory } from 'langchain/memory';
 import {
   ChatPromptTemplate,
   HumanMessagePromptTemplate,
   MessagesPlaceholder,
+  PromptTemplate,
   SystemMessagePromptTemplate,
 } from 'langchain/prompts';
+import { CheerioWebBaseLoader } from 'langchain/document_loaders';
+import { OpenAI } from 'langchain';
+import * as fs from 'fs';
+import { HNSWLib } from 'langchain/vectorstores';
+import { OpenAIEmbeddings } from 'langchain/embeddings';
+
+import * as crypto from 'crypto';
 
 @Injectable()
 export class ChatService {
@@ -20,22 +33,69 @@ export class ChatService {
     let observer: Subscriber<string> = null;
     const observable = new Observable<string>((ob) => {
       observer = ob;
+      if (data.extraDataUrl) {
+        this.dealWithWebLink(data, observer);
+      } else {
+        const { chain } = this.getInstanceBySession(
+          data,
+          CallbackManager.fromHandlers({
+            async handleLLMNewToken(token: string) {
+              observer.next(token);
+            },
+          }),
+        );
 
-      const { chain } = this.getInstanceBySession(
-        data,
-        CallbackManager.fromHandlers({
-          async handleLLMNewToken(token: string) {
-            observer.next(token);
-          },
-        }),
-      );
-
-      chain.call({
-        input: data.text,
-      });
+        chain.call({
+          input: data.text,
+        });
+      }
     });
 
     return observable;
+  }
+
+  private async dealWithWebLink(
+    data: ChatMessageDto,
+    observer: Subscriber<string>,
+  ) {
+    const loader = new CheerioWebBaseLoader(data.extraDataUrl);
+    const docs = await loader.loadAndSplit();
+
+    const path = crypto
+      .createHash('md5')
+      .update(data.extraDataUrl)
+      .digest('hex');
+
+    let vectorStore;
+    if (fs.existsSync(path)) {
+      vectorStore = await HNSWLib.load(
+        path,
+        new OpenAIEmbeddings({ openAIApiKey: data.openAIToken }),
+      );
+    } else {
+      vectorStore = await HNSWLib.fromDocuments(
+        docs,
+        new OpenAIEmbeddings({ openAIApiKey: data.openAIToken }),
+      );
+      await vectorStore.save(path);
+    }
+
+    const model = new OpenAI({
+      streaming: true,
+      openAIApiKey: data.openAIToken,
+      callbackManager: CallbackManager.fromHandlers({
+        async handleLLMNewToken(token: string) {
+          observer.next(token);
+        },
+      }),
+    });
+
+    const chain = ConversationalRetrievalQAChain.fromLLM(
+      model,
+      vectorStore.asRetriever(),
+    );
+
+    chain.call({ question: data.text, chat_history: [] });
   }
 
   // 判断数据是否有变化, 除了text之外的数据

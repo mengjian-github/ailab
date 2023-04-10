@@ -9,6 +9,7 @@ import {
   updateSession,
 } from "./store/session-list";
 import { setOpenAIToken } from "../../global-store";
+import Head from "next/head";
 
 /**
  * 会话页面
@@ -93,6 +94,9 @@ export default function Chat() {
 
   return (
     <>
+      <Head>
+        <title>聊天助手（普通版）</title>
+      </Head>
       <div className="flex">
         <SideBar
           onCreateBtnClick={onCreateBtnClick}

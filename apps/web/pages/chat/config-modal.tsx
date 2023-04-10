@@ -1,7 +1,11 @@
-import { Form, Input, Modal } from "antd";
-import { useEffect } from "react";
+import { Form, Input, Modal, Radio } from "antd";
+import { useEffect, useState } from "react";
 import { uuid } from "uuidv4";
 import { getOpenAIToken } from "../../global-store";
+import { InboxOutlined } from "@ant-design/icons";
+import { Upload } from "antd";
+
+const { Dragger } = Upload;
 
 /**
  * 会话配置弹窗模式
@@ -52,6 +56,15 @@ export interface SessionConfig {
   timeout?: number;
   // 模型参数
   maxTokens?: number;
+  extraDataType: ExtraDataType;
+  extraDataUrl?: string;
+}
+
+// 附加数据类型
+enum ExtraDataType {
+  None,
+  Url,
+  File,
 }
 
 /**
@@ -62,6 +75,7 @@ export interface SessionConfig {
 export function ConfigModal(props: ConfigModalProps) {
   const { mode, open, onOk, onCancel, initialSessionConfig } = props;
   const [form] = Form.useForm<SessionConfig>();
+  const [extraDataType, setExtraDataType] = useState(ExtraDataType.None);
 
   /**
    * 默认会话配置
@@ -77,6 +91,8 @@ export function ConfigModal(props: ConfigModalProps) {
     presencePenalty: 0,
     n: 1,
     modelName: "gpt-3.5-turbo",
+    extraDataType: ExtraDataType.None,
+    extraDataUrl: "",
   };
 
   // 如果是修改模式, 则设置为当前会话配置(为了回显), 否则设置为默认会话配置
@@ -194,6 +210,47 @@ export function ConfigModal(props: ConfigModalProps) {
         >
           <Input />
         </Form.Item>
+        <Form.Item
+          name="extraDataType"
+          label="额外资料类型"
+          tooltip="提供给AI的额外资料，可以是网页或文件，AI将会根据这些资料进行回答。"
+        >
+          <Radio.Group
+            onChange={(e) => {
+              setExtraDataType(e.target.value);
+            }}
+          >
+            <Radio value={ExtraDataType.None}>无</Radio>
+            <Radio value={ExtraDataType.Url}>网页</Radio>
+            <Radio value={ExtraDataType.File}>文件</Radio>
+          </Radio.Group>
+        </Form.Item>
+        {extraDataType === ExtraDataType.Url && (
+          <Form.Item
+            name="extraDataUrl"
+            label="额外资料网址"
+            tooltip="提供给AI的额外资料，可以是网页或文件，AI将会根据这些资料进行回答。"
+          >
+            <Input type="url" />
+          </Form.Item>
+        )}
+        {extraDataType === ExtraDataType.File && (
+          <Form.Item
+            name="extraDataFile"
+            label="额外资料文件"
+            tooltip="提供给AI的额外资料，可以是网页或文件，AI将会根据这些资料进行回答。"
+          >
+            <Dragger>
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">
+                请点击或拖拽文件到此区域以上传。
+              </p>
+              <p className="ant-upload-hint">支持单个或批量上传。</p>
+            </Dragger>
+          </Form.Item>
+        )}
       </Form>
     </Modal>
   );

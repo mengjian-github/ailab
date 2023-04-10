@@ -1,5 +1,6 @@
 import {
   IsArray,
+  IsBoolean,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -11,9 +12,9 @@ export class ChatMessageDto {
   @IsString()
   id: string;
 
-  @IsNotEmpty()
   @IsString()
-  text: string;
+  @IsOptional()
+  text?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -52,4 +53,12 @@ export class ChatMessageDto {
   @IsNumber()
   @IsOptional()
   maxTokens?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isAbstract?: boolean;
+
+  @IsString()
+  @IsOptional()
+  extraDataUrl?: string;
 }

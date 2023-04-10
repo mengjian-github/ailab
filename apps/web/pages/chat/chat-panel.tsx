@@ -86,7 +86,7 @@ export function ChatPanel(props: ChatPanelProps) {
     );
   }
 
-  const { systemPrompt, id } = sessionConfig;
+  const { systemPrompt, id, extraDataUrl } = sessionConfig;
 
   // 滚动到底部
   const scrollToEnd = () => {
@@ -109,13 +109,14 @@ export function ChatPanel(props: ChatPanelProps) {
     addMessageToStore(id, message);
   };
 
-  const sendMessage = async () => {
+  const sendMessage = async (isAbstract = false) => {
     // 首先，当前消息上屏
-    addMessage({
-      type: MessageType.Send,
-      text: inputValue,
-      id: uuid(),
-    });
+    !isAbstract &&
+      addMessage({
+        type: MessageType.Send,
+        text: inputValue,
+        id: uuid(),
+      });
 
     // 然后，清空输入框
     setInputValue("");
@@ -127,7 +128,11 @@ export function ChatPanel(props: ChatPanelProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: inputValue, ...sessionConfig }),
+        body: JSON.stringify({
+          text: inputValue,
+          ...sessionConfig,
+          isAbstract,
+        }),
       });
 
       // 处理SSE的返回
@@ -196,6 +201,30 @@ export function ChatPanel(props: ChatPanelProps) {
       </div>
 
       <div className="absolute  bottom-8 left-16 right-16">
+        {extraDataUrl && (
+          <Alert
+            className="mb-4"
+            message={
+              <div className="flex items-center justify-between">
+                <p>
+                  您当前基于Web URL内容：
+                  <a href={extraDataUrl}>{extraDataUrl}</a>
+                  ，可对网页内容进行提问
+                </p>
+                <Button
+                  type="primary"
+                  size="small"
+                  onClick={() => sendMessage(true)}
+                >
+                  点此总结摘要
+                </Button>
+              </div>
+            }
+            type="info"
+            showIcon
+            closable
+          />
+        )}
         {systemPrompt && (
           <Alert
             className="mb-4"
