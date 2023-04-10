@@ -3,68 +3,91 @@ import { ChatOpenAI } from 'langchain/chat_models';
 import { CallbackManager } from 'langchain/callbacks';
 import { Observable, Subscriber } from 'rxjs';
 import { ChatMessageDto } from './chat.dto';
-import {
-  ConversationChain,
-  ConversationalRetrievalQAChain,
-  loadQAMapReduceChain,
-  loadSummarizationChain,
-} from 'langchain/chains';
-import { BufferWindowMemory } from 'langchain/memory';
-import {
-  ChatPromptTemplate,
-  HumanMessagePromptTemplate,
-  MessagesPlaceholder,
-  PromptTemplate,
-  SystemMessagePromptTemplate,
-} from 'langchain/prompts';
+import { ConversationalRetrievalQAChain } from 'langchain/chains';
 import { CheerioWebBaseLoader } from 'langchain/document_loaders';
-import { OpenAI } from 'langchain';
 import * as fs from 'fs';
 import { HNSWLib } from 'langchain/vectorstores';
 import { OpenAIEmbeddings } from 'langchain/embeddings';
 
 import * as crypto from 'crypto';
+import { OpenAIChat } from 'langchain/llms';
+import {
+  AIChatMessage,
+  HumanChatMessage,
+  SystemChatMessage,
+} from 'langchain/schema';
+
+// 提问模板
+const questionGeneratorTemplate = `Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question(use chinese).
+
+Chat History:
+{chat_history}
+Follow Up Input: {question}
+Standalone question:`;
+
+// 回答模板
+const qaTemplate = `Use the following pieces of context to answer the question at the end(use chinese)
+
+{context}
+
+Question: {question}
+Helpful Answer:`;
 
 @Injectable()
 export class ChatService {
-  private sessionMap = new Map<string, any>();
-
   sendMessage(data: ChatMessageDto) {
     let observer: Subscriber<string> = null;
     const observable = new Observable<string>((ob) => {
       observer = ob;
-      if (data.extraDataUrl) {
-        this.dealWithWebLink(data, observer);
-      } else {
-        const { chain } = this.getInstanceBySession(
-          data,
-          CallbackManager.fromHandlers({
-            async handleLLMNewToken(token: string) {
-              observer.next(token);
-            },
-          }),
-        );
 
-        chain.call({
-          input: data.text,
-        });
+      const callbackManager = CallbackManager.fromHandlers({
+        async handleLLMNewToken(token: string) {
+          observer.next(token);
+        },
+      });
+
+      if (data.extraDataUrl) {
+        this.qaWithContent(data, callbackManager);
+      } else {
+        this.chat(data, callbackManager);
       }
     });
 
     return observable;
   }
 
-  private async dealWithWebLink(
+  private async chat(data: ChatMessageDto, callbackManager: CallbackManager) {
+    const model = new ChatOpenAI({
+      streaming: true,
+      openAIApiKey: data.openAIToken,
+      callbackManager,
+      ...data,
+    });
+
+    model.call([
+      new SystemChatMessage(
+        'The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know.',
+      ),
+      ...data.messageList.map((m) => {
+        if (m.type === 0) {
+          return new HumanChatMessage(m.text);
+        }
+        return new AIChatMessage(m.text);
+      }),
+      new HumanChatMessage(data.text),
+    ]);
+  }
+
+  private async qaWithContent(
     data: ChatMessageDto,
-    observer: Subscriber<string>,
+    callbackManager: CallbackManager,
   ) {
     const loader = new CheerioWebBaseLoader(data.extraDataUrl);
     const docs = await loader.loadAndSplit();
 
-    const path = crypto
-      .createHash('md5')
-      .update(data.extraDataUrl)
-      .digest('hex');
+    const path =
+      './.url-store/' +
+      crypto.createHash('md5').update(data.extraDataUrl).digest('hex');
 
     let vectorStore;
     if (fs.existsSync(path)) {
@@ -80,79 +103,25 @@ export class ChatService {
       await vectorStore.save(path);
     }
 
-    const model = new OpenAI({
+    const model = new OpenAIChat({
       streaming: true,
       openAIApiKey: data.openAIToken,
-      callbackManager: CallbackManager.fromHandlers({
-        async handleLLMNewToken(token: string) {
-          observer.next(token);
-        },
-      }),
+      callbackManager,
+      ...data,
     });
 
     const chain = ConversationalRetrievalQAChain.fromLLM(
       model,
       vectorStore.asRetriever(),
+      {
+        qaTemplate,
+        questionGeneratorTemplate,
+      },
     );
 
-    chain.call({ question: data.text, chat_history: [] });
-  }
-
-  // 判断数据是否有变化, 除了text之外的数据
-  private isDataChange(a, b) {
-    for (const [key, value] of Object.entries(a)) {
-      if (key === 'text') {
-        continue;
-      }
-      if (value !== b[key]) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // 通过session获取缓存实例，因为保存上下文需要依赖同一个实例，而每次new的时候都会导致上下文丢失
-  private getInstanceBySession(data: ChatMessageDto, callbackManager) {
-    const sessionInstance = this.sessionMap.get(data.id);
-    // 如果session存在且数据没有变化，直接返回session实例
-    if (sessionInstance && !this.isDataChange(data, sessionInstance.data)) {
-      // 重设一下callbackManager
-      sessionInstance.model.callbackManager = callbackManager;
-      return sessionInstance;
-    }
-    const model = new ChatOpenAI({
-      openAIApiKey: data.openAIToken,
-      streaming: true,
-      callbackManager,
-      ...data,
+    chain.call({
+      question: data.text,
+      chat_history: data.messageList.map((m) => m.text),
     });
-
-    const prompt = ChatPromptTemplate.fromPromptMessages([
-      SystemMessagePromptTemplate.fromTemplate(
-        data.systemPrompt +
-          'The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know.',
-      ),
-      new MessagesPlaceholder('history'),
-      HumanMessagePromptTemplate.fromTemplate('{input}'),
-    ]);
-
-    const chain = new ConversationChain({
-      memory: new BufferWindowMemory({
-        returnMessages: true,
-        memoryKey: 'history',
-      }),
-      prompt,
-      llm: model,
-    });
-
-    const result = {
-      model,
-      prompt,
-      chain,
-      data,
-    };
-    this.sessionMap.set(data.id, result);
-
-    return result;
   }
 }

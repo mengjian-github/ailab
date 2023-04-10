@@ -132,6 +132,7 @@ export function ChatPanel(props: ChatPanelProps) {
           text: inputValue,
           ...sessionConfig,
           isAbstract,
+          messageList: messageList.slice(-10) // 只取最近10条消息
         }),
       });
 
@@ -206,7 +207,7 @@ export function ChatPanel(props: ChatPanelProps) {
             className="mb-4"
             message={
               <div className="flex items-center justify-between">
-                <p>
+                <p className="min-width-0 flex-shrink-0 max-w-[80%] whitespace-nowrap overflow-hidden text-ellipsis">
                   您当前基于Web URL内容：
                   <a href={extraDataUrl}>{extraDataUrl}</a>
                   ，可对网页内容进行提问

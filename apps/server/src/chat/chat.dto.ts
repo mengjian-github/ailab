@@ -61,4 +61,7 @@ export class ChatMessageDto {
   @IsString()
   @IsOptional()
   extraDataUrl?: string;
+
+  @IsArray()
+  messageList: Array<any>;
 }
