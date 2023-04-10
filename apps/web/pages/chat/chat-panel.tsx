@@ -1,6 +1,6 @@
 import { Alert, Avatar, Button, Card, Empty, Input, List } from "antd";
 import cn from "classnames";
-import { marked } from 'marked';
+import { marked } from "marked";
 import { SessionConfig } from "./config-modal";
 import { useEffect, useState } from "react";
 import { addMessage as addMessageToStore, getMessageList } from "./store/chat";
@@ -77,7 +77,6 @@ export function ChatPanel(props: ChatPanelProps) {
     });
   }, [sessionConfig?.id]);
 
-
   // 如果没有会话配置，则显示空
   if (!sessionConfig) {
     return (
@@ -88,8 +87,6 @@ export function ChatPanel(props: ChatPanelProps) {
   }
 
   const { systemPrompt, id } = sessionConfig;
-
-  
 
   // 滚动到底部
   const scrollToEnd = () => {
@@ -186,11 +183,11 @@ export function ChatPanel(props: ChatPanelProps) {
                 >
                   {conf.avatar}
                 </Avatar>
-                <Card
-                  size="small"
-                  className={cn(conf.classNames.card)}
-                >
-                  <div className="markdown-body"dangerouslySetInnerHTML={{ __html: item.text }}></div>
+                <Card size="small" className={cn(conf.classNames.card)}>
+                  <div
+                    className="markdown-body"
+                    dangerouslySetInnerHTML={{ __html: item.text }}
+                  ></div>
                 </Card>
               </List.Item>
             );
@@ -217,7 +214,12 @@ export function ChatPanel(props: ChatPanelProps) {
               setInputValue(event.target.value);
             }}
             onPressEnter={(event) => {
-              if (event.altKey || event.ctrlKey || event.shiftKey || event.metaKey) {
+              if (
+                event.altKey ||
+                event.ctrlKey ||
+                event.shiftKey ||
+                event.metaKey
+              ) {
                 return;
               }
               event.preventDefault();

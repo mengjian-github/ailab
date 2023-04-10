@@ -9,6 +9,10 @@ import {
 export class ChatMessageDto {
   @IsNotEmpty()
   @IsString()
+  id: string;
+
+  @IsNotEmpty()
+  @IsString()
   text: string;
 
   @IsNotEmpty()
