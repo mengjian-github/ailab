@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "ailab",
       script: "./apps/server/dist/main.js",
-      env: { PORT: 80, NODE_ENV: "production" },
+      env: { PORT: 443, NODE_ENV: "production" },
     },
   ],
 };
