@@ -6,3 +6,12 @@
   padding: 0;
   margin: 0;
 }
+
+@font-face {
+  font-family: "js";
+  src: url("/subset-Kingsoft_Cloud_Font.woff2") format("woff2"),
+    url("/subset-Kingsoft_Cloud_Font.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
