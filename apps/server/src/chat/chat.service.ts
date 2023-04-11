@@ -6,6 +6,7 @@ import { ChatMessageDto } from './chat.dto';
 import { ConversationalRetrievalQAChain } from 'langchain/chains';
 import {
   CheerioWebBaseLoader,
+  GithubRepoLoader,
   PDFLoader,
   TextLoader,
 } from 'langchain/document_loaders';
@@ -50,7 +51,7 @@ export class ChatService {
         },
       });
 
-      if (data.extraDataUrl || data.filename) {
+      if (data.extraDataUrl || data.filename || data.extraDataGithub) {
         this.qaWithContent(data, callbackManager);
       } else {
         this.chat(data, callbackManager);
@@ -93,6 +94,10 @@ export class ChatService {
             pdfjs: () => import('pdfjs-dist/legacy/build/pdf.js'),
           })
         : new TextLoader('./.uploads/' + data.filename);
+    } else if (data.extraDataGithub) {
+      loader = new GithubRepoLoader(data.extraDataGithub, {
+        accessToken: data.githubToken,
+      });
     } else {
       loader = new CheerioWebBaseLoader(data.extraDataUrl);
     }
@@ -102,7 +107,7 @@ export class ChatService {
       './.store/' +
       crypto
         .createHash('md5')
-        .update(data.filename || data.extraDataUrl)
+        .update(data.filename || data.extraDataGithub || data.extraDataUrl)
         .digest('hex');
 
     let vectorStore;

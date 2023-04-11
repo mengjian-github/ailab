@@ -62,6 +62,14 @@ export class ChatMessageDto {
   @IsOptional()
   extraDataUrl?: string;
 
+  @IsString()
+  @IsOptional()
+  extraDataGithub?: string;
+
+  @IsString()
+  @IsOptional()
+  githubToken?: string;
+
   @IsArray()
   messageList: Array<any>;
 
