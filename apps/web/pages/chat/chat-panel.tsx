@@ -68,6 +68,7 @@ export function ChatPanel(props: ChatPanelProps) {
         scrollToEnd();
       } else {
         // 如果没有消息，则发送欢迎语
+        setMessageList([]);
         addMessage({
           id: uuid(),
           type: MessageType.Reply,
@@ -132,7 +133,7 @@ export function ChatPanel(props: ChatPanelProps) {
           text: inputValue,
           ...sessionConfig,
           isAbstract,
-          messageList: messageList.slice(-10) // 只取最近10条消息
+          messageList: messageList.slice(-10), // 只取最近10条消息
         }),
       });
 
@@ -202,14 +203,13 @@ export function ChatPanel(props: ChatPanelProps) {
       </div>
 
       <div className="absolute  bottom-8 left-16 right-16">
-      {filename && (
+        {filename && (
           <Alert
             className="mb-4"
             message={
               <div className="flex items-center justify-between">
                 <p className="min-width-0 flex-shrink-0 max-w-[80%] whitespace-nowrap overflow-hidden text-ellipsis">
-                  您当前基于文件（{filename}）内容：
-                  可对文件内容进行提问
+                  您当前基于文件（{filename}）内容： 可对文件内容进行提问
                 </p>
                 <Button
                   type="primary"
