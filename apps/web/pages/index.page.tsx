@@ -14,8 +14,8 @@ export default function Web() {
         }}
         className="absolute w-full h-full z-10"
       ></div>
-      <div className="absolute z-10 flex flex-col  w-full h-full items-center ">
-        <h1 className="mt-48 text-6xl">AI 实验室</h1>
+      <div className="absolute z-10 flex flex-col  w-full h-full items-center justify-center ">
+        <h1 className="text-6xl">AI 实验室</h1>
         <p className="mt-8 font-thin">为AI赋能，让未来更美好</p>
         <ul className="mt-32 text-center list-none">
           <li>
