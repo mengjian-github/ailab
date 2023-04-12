@@ -46,6 +46,9 @@ export class ChatService {
       observer = ob;
 
       const callbackManager = CallbackManager.fromHandlers({
+        async handleLLMStart(llm, prompts) {
+          console.log('handleLLMStart', prompts);
+        },
         async handleLLMNewToken(token: string) {
           observer.next(token);
         },
@@ -71,7 +74,8 @@ export class ChatService {
 
     model.call([
       new SystemChatMessage(
-        'The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know.',
+        data.systemPrompt +
+          'The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know.',
       ),
       ...data.messageList.map((m) => {
         if (m.type === 0) {
