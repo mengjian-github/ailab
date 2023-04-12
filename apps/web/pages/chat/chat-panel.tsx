@@ -134,7 +134,7 @@ export function ChatPanel(props: ChatPanelProps) {
           text: inputValue,
           ...sessionConfig,
           isAbstract,
-          messageList: messageList.slice(-10), // 只取最近10条消息
+          messageList: messageList.slice(-11).slice(1), // 只取最近10条消息(并去掉欢迎语)
         }),
       });
 
