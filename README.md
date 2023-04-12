@@ -1,73 +1,52 @@
-# Turborepo starter
+# AI 实验室
 
-This is an official pnpm starter turborepo.
+AI 实验室（https://www.ailab.fit/）是一个开源的AI探索广场，为AI从业者、研究人员或者AI爱好者们提供了一个可以针对Open API 进行实验的能力，目前探索的场景有：
 
-## What's inside?
+- 实时翻译
+- 个人助理
+- AI 调参
+- 智能客服
+- 更多能力场景持续建设中...
 
-This turborepo uses [pnpm](https://pnpm.io) as a package manager. It includes the following packages/apps:
+## 功能详情
 
-### Apps and Packages
+### 实时翻译
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `ui`: a stub React component library shared by both `web` and `docs` applications
-- `eslint-config-custom`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `tsconfig`: `tsconfig.json`s used throughout the monorepo
+这里提供了一个利用 Open AI 的 API 进行翻译的平台，支持 `prompt` 的自定义，您可以让 AI 返回更适合自己场景的翻译方案。
+与直接使用`ChatGPT`不同的是，这里对文本内容进行了自动分割，可以突破 AI 的上下文设置，您可以将大段长文本输入进来：
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+![translate](.assets/translate.png)
 
-### Utilities
+### 个人助理
 
-This turborepo has some additional tools already setup for you:
+与`ChatGPT`类似，AI 实现了一个可供聊天的会话交互界面，可以保持会话上下文，与 AI 进行对话，只需要有`API KEY`，对网络环境无特殊要求：
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+![chat](.assets/chat.png)
 
-### Build
+#### 系统角色扮演
 
-To build all apps and packages, run the following command:
+在助手里支持预设角色扮演，与`ChatGPT`不同的是，在整个会话过程中，AI 会保持一致的系统角色行为，而不会因上下文过长而丢失。
 
-```
-cd my-turborepo
-pnpm run build
-```
+![role](.assets/role.jpg)
 
-### Develop
+### AI 调参
 
-To develop all apps and packages, run the following command:
+在会话配置界面，可以配置不同的 AI 参数，支持 OpenAI 所有模型，用于调试不同参数组合下的 AI 回复的质量是否满足要求，这在我们做应用开发的场景十分有用。
 
-```
-cd my-turborepo
-pnpm run dev
-```
+![param](.assets/param.png)
 
-### Remote Caching
+### 智能客服
 
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+在智能助手里，还支持了基于提供语料环境进行客服问答的能力，目前支持在线网页、PDF 上传、Github 等。
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
+#### 基于网页的内容问答
 
-```
-cd my-turborepo
-pnpm dlx turbo login
-```
+输入网页可以在线解析网页内容，基于内容做问答：
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+![web](.assets/web.jpg)
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your turborepo:
+#### 基于 PDF 的内容问答
 
-```
-pnpm dlx turbo link
-```
+上传 PDF 文件，可以基于 PDF 文件本身来进行问答：
 
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+![file](.assets/file.jpg)
