@@ -138,6 +138,11 @@ export function ConfigModal(props: ConfigModalProps) {
           .then((values) => {
             onOk({
               ...values,
+              temperature: Number(values.temperature),
+              topP: Number(values.topP),
+              frequencyPenalty: Number(values.frequencyPenalty),
+              presencePenalty: Number(values.presencePenalty),
+              n: Number(values.n),
               filename: file?.response?.filename || "",
               fileMimeType: file?.response?.mimetype || "",
             });
@@ -183,7 +188,7 @@ export function ConfigModal(props: ConfigModalProps) {
           label="temperature"
           tooltip="采样温度应该在0和2之间，如果未指定，则默认为1。"
         >
-          <Input />
+          <Input type="number" />
         </Form.Item>
         <Form.Item
           name="topP"
