@@ -17,6 +17,7 @@ export default function Web() {
       <div className="absolute z-10 flex flex-col  w-full h-full items-center justify-center ">
         <h1 className="text-6xl">AI 实验室</h1>
         <p className="mt-8 font-thin">为AI赋能，让未来更美好</p>
+
         <ul className="mt-32 text-center list-none">
           <li>
             <a className="text-white" href="/translate.html">
@@ -30,6 +31,14 @@ export default function Web() {
           </li>
           <li className="mt-4">
             <a className="text-gray-300">个人助手（高级版）</a>
+          </li>
+          <li className="mt-4">
+            <a
+              className="text-white"
+              href="https://github.com/mengjian-github/ailab"
+            >
+              Github
+            </a>
           </li>
         </ul>
       </div>
