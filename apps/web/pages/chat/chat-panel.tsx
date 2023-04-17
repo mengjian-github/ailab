@@ -5,6 +5,7 @@ import { SessionConfig } from "./config-modal";
 import { useEffect, useState } from "react";
 import { addMessage as addMessageToStore, getMessageList } from "./store/chat";
 import { uuid } from "uuidv4";
+import { getQueryParam, isAdvanced } from "../../utils";
 
 // 会话面板属性
 interface ChatPanelProps {
@@ -171,6 +172,8 @@ export function ChatPanel(props: ChatPanelProps) {
     }
   };
 
+  const managePlugin = () => {};
+
   return (
     <div className="flex relative justify-center flex-1">
       <div className="min-w-[80%] max-w-[80%] shrink-0">
@@ -204,6 +207,28 @@ export function ChatPanel(props: ChatPanelProps) {
       </div>
 
       <div className="absolute  bottom-8 left-16 right-16">
+        {isAdvanced() && (
+          <Alert
+            className="mb-4"
+            message={
+              <div className="flex items-center justify-between">
+                <p className="min-width-0 flex-shrink-0 max-w-[80%] whitespace-nowrap overflow-hidden text-ellipsis">
+                  您当前访问的是高级版，可以使用插件的能力。
+                </p>
+                <Button
+                  type="primary"
+                  size="small"
+                  onClick={() => managePlugin()}
+                >
+                  管理插件
+                </Button>
+              </div>
+            }
+            type="info"
+            showIcon
+            closable
+          />
+        )}
         {extraDataGithub && (
           <Alert
             className="mb-4"

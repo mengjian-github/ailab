@@ -10,6 +10,8 @@ import {
 } from "./store/session-list";
 import { setOpenAIToken } from "../../global-store";
 import Head from "next/head";
+import { store } from "./store";
+import { Provider } from "react-redux";
 
 /**
  * 会话页面
@@ -93,7 +95,7 @@ export default function Chat() {
   };
 
   return (
-    <>
+    <Provider store={store}>
       <Head>
         <title>聊天助手（普通版）</title>
       </Head>
@@ -121,6 +123,6 @@ export default function Chat() {
         onOk={onConfigModalOk}
         onCancel={() => setConfigModalOpen(false)}
       />
-    </>
+    </Provider>
   );
 }

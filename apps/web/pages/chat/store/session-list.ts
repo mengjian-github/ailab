@@ -1,6 +1,53 @@
+import { createSlice } from "@reduxjs/toolkit";
 import { SessionConfig } from "../config-modal";
 
 const SESSION_LIST_KEY = "SESSION_LIST_KEY";
+
+export interface SessionListState {
+  sessionList: SessionConfig[];
+}
+
+const initialState: SessionListState = {
+  sessionList: [],
+};
+
+export const sessionListSlice = createSlice({
+  name: "sessionList",
+  initialState,
+  reducers: {
+    setSessionList: (state, action) => {
+      state.sessionList = action.payload;
+      localStorage.setItem(SESSION_LIST_KEY, JSON.stringify(state.sessionList));
+    },
+
+    addSession: (state, action) => {
+      state.sessionList.push(action.payload);
+      localStorage.setItem(SESSION_LIST_KEY, JSON.stringify(state.sessionList));
+    },
+    updateSession: (state, action) => {
+      const index = state.sessionList.findIndex(
+        (item) => item.id === action.payload.id
+      );
+      if (index !== -1) {
+        state.sessionList[index] = action.payload;
+      }
+      localStorage.setItem(SESSION_LIST_KEY, JSON.stringify(state.sessionList));
+    },
+    removeSessionById: (state, action) => {
+      const index = state.sessionList.findIndex(
+        (item) => item.id === action.payload
+      );
+      if (index !== -1) {
+        state.sessionList.splice(index, 1);
+      }
+      localStorage.setItem(SESSION_LIST_KEY, JSON.stringify(state.sessionList));
+    },
+  },
+});
+
+export const { setSessionList } = sessionListSlice.actions;
+
+export default sessionListSlice.reducer;
 
 /**
  * 获取会话列表
@@ -13,50 +60,6 @@ export async function getSessionList(): Promise<SessionConfig[]> {
   } catch (e) {
     return [];
   }
-}
-
-/**
- * 设置会话列表
- * @param sessionList
- */
-export async function setSessionList(sessionList: SessionConfig[]) {
-  await localStorage.setItem(SESSION_LIST_KEY, JSON.stringify(sessionList));
-}
-
-/**
- * 添加会话
- * @param session
- */
-export async function addSession(session: SessionConfig) {
-  const sessionList = await getSessionList();
-  sessionList.push(session);
-  await setSessionList(sessionList);
-}
-
-/**
- * 根据id删除会话
- * @param session
- */
-export async function removeSessionById(id: string) {
-  const sessionList = await getSessionList();
-  const index = sessionList.findIndex((item) => item.id === id);
-  if (index !== -1) {
-    sessionList.splice(index, 1);
-  }
-  await setSessionList(sessionList);
-}
-
-/**
- * 更新会话
- * @param session
- */
-export async function updateSession(session: SessionConfig) {
-  const sessionList = await getSessionList();
-  const index = sessionList.findIndex((item) => item.id === session.id);
-  if (index !== -1) {
-    sessionList[index] = session;
-  }
-  await setSessionList(sessionList);
 }
 
 /**
