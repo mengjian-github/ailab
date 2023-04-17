@@ -5,7 +5,7 @@ import { SessionConfig } from "./config-modal";
 import { useEffect, useState } from "react";
 import { addMessage as addMessageToStore, getMessageList } from "./store/chat";
 import { uuid } from "uuidv4";
-import { getQueryParam, isAdvanced } from "../../utils";
+import { isAdvanced } from "../../utils";
 
 // 会话面板属性
 interface ChatPanelProps {

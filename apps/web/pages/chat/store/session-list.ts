@@ -45,7 +45,8 @@ export const sessionListSlice = createSlice({
   },
 });
 
-export const { setSessionList } = sessionListSlice.actions;
+export const { setSessionList, addSession, updateSession, removeSessionById } =
+  sessionListSlice.actions;
 
 export default sessionListSlice.reducer;
 
@@ -53,8 +54,8 @@ export default sessionListSlice.reducer;
  * 获取会话列表
  * @returns
  */
-export async function getSessionList(): Promise<SessionConfig[]> {
-  const sessionList = await localStorage.getItem(SESSION_LIST_KEY);
+export function getSessionList(): SessionConfig[] {
+  const sessionList = localStorage.getItem(SESSION_LIST_KEY);
   try {
     return JSON.parse(sessionList || "[]");
   } catch (e) {
@@ -67,9 +68,7 @@ export async function getSessionList(): Promise<SessionConfig[]> {
  * @param id
  * @returns
  */
-export async function getSessionById(
-  id: string
-): Promise<SessionConfig | undefined> {
-  const sessionList = await getSessionList();
+export function getSessionById(id: string): SessionConfig | undefined {
+  const sessionList = getSessionList();
   return sessionList.find((item) => item.id === id);
 }

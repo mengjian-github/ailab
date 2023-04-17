@@ -2,51 +2,42 @@ import { useEffect, useState } from "react";
 import { ConfigModal, ModalMode, SessionConfig } from "./config-modal";
 import { SideBar } from "./sidebar";
 import { ChatPanel } from "./chat-panel";
-import {
-  addSession,
-  getSessionList,
-  removeSessionById,
-  updateSession,
-} from "./store/session-list";
 import { setOpenAIToken } from "../../global-store";
 import Head from "next/head";
-import { store } from "./store";
-import { Provider } from "react-redux";
+import { RootState, store } from "./store";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { addSession, getSessionList, removeSessionById, setSessionList, updateSession } from "./store/session-list";
 
 /**
  * 会话页面
  * @returns
  */
-export default function Chat() {
+export function Chat() {
+  const { sessionList } = useSelector((state: RootState) => state.sessionList)
+  const dispatch = useDispatch()
   const [configModalOpen, setConfigModalOpen] = useState(false);
   const [configModalMode, setConfigModalMode] = useState(ModalMode.Create);
-  const [sessionList, setSessionList] = useState<SessionConfig[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
 
   // 获取会话列表, 并设置当前会话为第一个会话
   useEffect(() => {
-    getSessionList().then((list) => {
-      setSessionList(list);
+    const list = getSessionList();
+    dispatch(setSessionList(list));
       if (list.length > 0) {
         setActiveSessionId(list[0].id);
       }
-    });
   }, []);
 
   // 创建新会话
   const createNewSession = (values: SessionConfig) => {
-    setSessionList((list) => [...list, values]);
-    addSession(values);
+   dispatch(addSession(values))
     // 设置当前会话为新创建的会话
     setActiveSessionId(values.id);
   };
 
   // 编辑会话
   const editSession = (values: SessionConfig) => {
-    setSessionList((list) =>
-      list.map((item) => (item.id === values.id ? values : item))
-    );
-    updateSession(values);
+    dispatch(updateSession(values))
   };
 
   // 创建新会话按钮点击
@@ -68,8 +59,7 @@ export default function Chat() {
 
   // 会话菜单删除
   const onMenuDelete = (id: string) => {
-    setSessionList((list) => list.filter((item) => item.id !== id));
-    removeSessionById(id);
+    dispatch(removeSessionById(id))
     // 如果删除的是当前会话, 则设置当前会话为第一个会话
     if (id === activeSessionId) {
       setActiveSessionId(sessionList[0]?.id ?? null);
@@ -95,7 +85,7 @@ export default function Chat() {
   };
 
   return (
-    <Provider store={store}>
+    <>
       <Head>
         <title>聊天助手（普通版）</title>
       </Head>
@@ -123,6 +113,12 @@ export default function Chat() {
         onOk={onConfigModalOk}
         onCancel={() => setConfigModalOpen(false)}
       />
-    </Provider>
+    </>
   );
+}
+
+export default function ChatWrapper() {
+  return <Provider store={store}>
+    <Chat />
+  </Provider>
 }

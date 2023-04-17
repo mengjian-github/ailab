@@ -1,7 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
+import sessionListReducer from "./session-list";
 
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    sessionList: sessionListReducer,
+  },
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
